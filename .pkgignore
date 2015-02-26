@@ -1,0 +1,4 @@
+mk/tmp
+mk/Makefile*
+mk/include
+mk/*.md

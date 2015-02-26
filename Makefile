@@ -9,6 +9,15 @@ VERSION := $(shell git rev-parse --short HEAD)
 
 all: deploy_version
 
+include mk/Makefile.php
+_MKVENDOR_php_CONFIGURE_FLAGS+= --with-pdo-mysql
+
+build: php deploy_version config/bazooka.json
+
+# just symlink to /tmp - the run.sh script fulfills promise this at startup
+config/bazooka.json:
+	ln -s /tmp/morgue.json $@
+
 deploy_version:
 	@echo "Setting MORGUE_VERSION to $(VERSION) in phplib/deploy_version.php..."
 	@sed 's/{{ VERSION }}/$(VERSION)/' <phplib/deploy_version.php.in >phplib/deploy_version.php

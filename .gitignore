@@ -1,0 +1,2 @@
+config/*.json
+phplib/deploy_version.php
