@@ -1,0 +1,98 @@
+# Base Makefile for configure/make/make install applications
+#
+# NOTE: no guard against multiple inclusion. It is an error to include this
+# file multiple times with the same _MKVENDOR_PKG_NAME.
+#
+# Basic usage:
+#
+# _MKVENDOR_example_VERSION=1.0.0
+# _MKVENDOR_example_URL=http://example.com/downloads
+# include mk/include/Makefile.cmi
+# $(eval $(call configure_make_install example))
+#
+# Note: for readability, the following assumes that the application/library is
+# called example and at version 1.0.0 - substitute as needed.
+#
+# This assumes
+# * the source tarball is at http://example.com/downloads/example-1.0.0.tar.gz
+# * it contains a folder example-1.0.0
+# * `configure && make` builds example-1.0.0/example
+# * `make install` installs this to `$(PREFIX)/bin/example`
+#
+# Many assumptions can be overridden, see the section for overridable variables below.
+#
+# Make targets:
+#
+# example: phony target to specify as a dependency
+# clean-example: remove temporary build artifacts. Does not clean the installed products!
+#
+# By default, the clean-example target is hooked into the general `clean` process, but the build target is not used, it should be depended on wherever applicable
+
+include mk/include/Makefile.base
+
+define configure_make_install
+
+ifndef _MKVENDOR_$(1)_URL
+$$(error Please define _MKVENDOR_$(1)_URL)
+endif
+
+ifndef _MKVENDOR_$(1)_VERSION
+$$(error Please define _MKVENDOR_$(1)_VERSION)
+endif
+
+# defaults for overridable variables
+_MKVENDOR_$(1)_SRC?=$(1)-$$(_MKVENDOR_$(1)_VERSION)
+_MKVENDOR_$(1)_EXT?=.tar.gz
+_MKVENDOR_$(1)_FILE?=$$(_MKVENDOR_$(1)_SRC)$$(_MKVENDOR_$(1)_EXT)
+_MKVENDOR_$(1)_BUILT_FILE?=$(1)
+_MKVENDOR_$(1)_INSTALLED_FILE?=bin/$(1)
+_MKVENDOR_$(1)_TAREXTRACT?=tar -x -C $$(_MKVENDOR_TMP)/ -f
+_MKVENDOR_$(1)_CONFIGURE_FILE?=configure
+_MKVENDOR_$(1)_CONFIGURE_ENV?= CPPFLAGS=-I$$(_MKVENDOR_BASE)/include LDFLAGS=-L$$(_MKVENDOR_BASE)/lib
+_MKVENDOR_$(1)_CONFIGURE_FLAGS?=
+_MKVENDOR_$(1)_CONFIGURE_PREFIX?= --prefix=$$(_MKVENDOR_BASE)
+_MKVENDOR_$(1)_MAKEFILE?=Makefile
+_MKVENDOR_$(1)_MAKE_FLAGS?=
+_MKVENDOR_$(1)_MAKE_INSTALL_FLAGS?=
+_MKVENDOR_$(1)_DEPENDS?=
+
+# phony build targets
+$(1): $$(_MKVENDOR_BASE)/$$(_MKVENDOR_$(1)_INSTALLED_FILE)
+
+clean: clean-$(1)
+
+clean-$(1):
+	rm -rf $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)
+
+distclean: distclean-$(1)
+
+distclean-$(1): clean-$(1)
+	rm -f $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_FILE)
+	rmdir tmp || true
+
+.PHONY: $(1) clean clean-$(1) distclean distclean-$(1)
+
+# download the tarball
+$$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_FILE):
+	mkdir -p $$(_MKVENDOR_TMP)
+	curl -L -s -o $$@ "$$(_MKVENDOR_$(1)_URL)/$$(_MKVENDOR_$(1)_FILE)"
+
+# extract the tarball - produce configure script
+$$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_CONFIGURE_FILE): $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_FILE)
+	$$(_MKVENDOR_$(1)_TAREXTRACT) $$<
+	touch $$@ # ensure configure script is newer than the tarball
+
+# configure - produce Makefile
+$$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_MAKEFILE): $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_CONFIGURE_FILE) $$(_MKVENDOR_$(1)_DEPENDS) | base-directories
+	cd $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC) && env $$(_MKVENDOR_$(1)_CONFIGURE_ENV) $$< $$(_MKVENDOR_$(1)_CONFIGURE_PREFIX) $$(_MKVENDOR_$(1)_CONFIGURE_FLAGS)
+	touch $$@ # ensure Makefile is newer than the configure script
+
+# make - produce built file
+$$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_BUILT_FILE): $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_MAKEFILE)
+	$$(MAKE) -C $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC) -f $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_MAKEFILE) $$(_MKVENDOR_$(1)_MAKE_FLAGS)
+
+# make install - produce installed file
+$$(_MKVENDOR_BASE)/$$(_MKVENDOR_$(1)_INSTALLED_FILE): $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_BUILT_FILE)
+	$$(MAKE) -C $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC) -f $$(_MKVENDOR_TMP)/$$(_MKVENDOR_$(1)_SRC)/$$(_MKVENDOR_$(1)_MAKEFILE) $$(_MKVENDOR_$(1)_MAKE_FLAGS) $$(_MKVENDOR_$(1)_MAKE_INSTALL_FLAGS) install
+
+endef

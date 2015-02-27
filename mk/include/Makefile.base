@@ -1,0 +1,22 @@
+ifndef _MKVENDOR_HAVE_MAKEFILE_BASE
+_MKVENDOR_HAVE_MAKEFILE_BASE=y
+
+_MKVENDOR_BASE?=$(CURDIR)/mk/vendor
+_MKVENDOR_TMP?=$(CURDIR)/mk/tmp
+
+build:
+
+clean: clean-base
+
+clean-base:
+	rm -rf $(_MKVENDOR_BASE)
+
+base-directories: $(_MKVENDOR_BASE)/lib $(_MKVENDOR_BASE)/include
+
+$(_MKVENDOR_BASE)/lib $(_MKVENDOR_BASE)/include:
+	mkdir -p $@
+
+.PHONY: build clean clean-base base-directories
+endif
+
+# vi: set filetype=make :
