@@ -76,6 +76,7 @@ class Persistence {
             return $postmortem;
 
         } catch(PDOException $e) {
+            error_log($e);
             return array("id" => null, "error" => $e->getMessage());
         }
     }
@@ -102,6 +103,7 @@ class Persistence {
             return $postmortem;
 
         } catch(PDOException $e) {
+            error_log($e);
             return array("id" => null, "error" => $e->getMessage());
         }
     }
@@ -140,6 +142,7 @@ class Persistence {
             return $forum;
 
         } catch(PDOException $e) {
+            error_log($e);
             return array("id" => null, "error" => $e->getMessage());
         }
     }
@@ -417,6 +420,7 @@ class Persistence {
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $conn;
         } catch(PDOException $e) {
+            error_log($e);
             return null;
         }
     }
