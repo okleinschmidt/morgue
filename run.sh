@@ -15,6 +15,9 @@ cat > "/tmp/morgue.json" <<EOF
 {
     "environment": "bazooka",
     "timezone": "UTC",
+    "time_format": "H:i",
+    "date_format": "Y-m-d",
+
 
     "database":
     {  "mysqlhost": "${MYSQL_HOST}",
