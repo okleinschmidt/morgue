@@ -38,10 +38,10 @@ Filler, to keep the same size
       <div class="controls controls-row">
         <input id="event-start-input-date" name="event-start-input-date"
                class="input-small datepicker" type="text"
-               value="<?php echo $start_datetime->format('m/d/Y'); ?>" >
+               value="<?php echo $start_datetime->format(getUserDateFormat()); ?>" >
         <input id="event-start-input-time" name="event-start-input-time"
                 class="input-mini timeentry" type="text"
-                value="<?php echo $start_datetime->format('g:iA'); ?>" >
+                value="<?php echo $start_datetime->format(getUserTimeFormat()); ?>" >
       </div>
     </div>
 
@@ -50,10 +50,10 @@ Filler, to keep the same size
       <div class="controls controls-row">
         <input id="event-end-input-date" name="event-end-input-date"
                class="input-small datepicker" type="text"
-               value="<?php echo $end_datetime->format('m/d/Y'); ?>" >
+               value="<?php echo $end_datetime->format(getUserDateFormat()); ?>" >
         <input id="event-end-input-time" name="event-end-input-time"
                class="input-mini timeentry" type="text"
-               value="<?php echo $end_datetime->format('g:iA'); ?>" >
+               value="<?php echo $end_datetime->format(getUserTimeFormat()); ?>" >
       </div>
     </div>
 
@@ -62,10 +62,10 @@ Filler, to keep the same size
       <div class="controls controls-row">
         <input id="event-detect-input-date" name="event-detect-input-date"
                class="input-small datepicker" type="text"
-               value="<?php echo $detect_datetime->format('m/d/Y'); ?>" >
+               value="<?php echo $detect_datetime->format(getUserDateFormat()); ?>" >
         <input id="event-detect-input-time" name="event-detect-input-time"
                class="input-mini timeentry" type="text"
-               value="<?php echo $detect_datetime->format('g:iA'); ?>" >
+               value="<?php echo $detect_datetime->format(getUserTimeFormat()); ?>" >
       </div>
     </div>
 

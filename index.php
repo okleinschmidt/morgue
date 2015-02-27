@@ -35,6 +35,32 @@ function getUserTimezone() {
     return $tz;
 }
 
+// helper method for returning the preferred time format
+// If set, get the format from the global config
+// otherwise default to 'g:iA'
+// returns: string
+function getUserTimeFormat() {
+  $config = Configuration::get_configuration();
+  if ( isset($config['time_format']) ) {
+    return $config['time_format'];
+  } else {
+    return 'g:iA';
+  }
+}
+
+// helper method for returning the preferred date format
+// If set, get the format from the global config
+// otherwise default to 'm/d/Y'
+// returns: string
+function getUserDateFormat() {
+  $config = Configuration::get_configuration();
+  if ( isset($config['date_format']) ) {
+    return $config['date_format'];
+  } else {
+    return 'm/d/Y';
+  }
+}
+
 // helper method to sort events reverse by starttime
 function cmp($first, $second) {
     if ($first['starttime'] == $second['starttime'] ) {

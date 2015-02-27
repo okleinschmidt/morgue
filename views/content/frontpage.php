@@ -15,10 +15,10 @@
       foreach ($events as $event) {
         $start = new DateTime("@".$event["starttime"]);
         $start->setTimezone($tz);
-        $start = $start->format('m/d/Y G:ia');
+        $start = $start->format(getUserDateFormat().' '.getUserTimeFormat());
         $end = new DateTime("@".$event["endtime"]);
         $end->setTimezone($tz);
-        $end = $end->format('m/d/Y G:ia');
+        $end = $end->format(getUserDateFormat().' '.getUserTimeFormat());
         echo "<tr>";
         echo "<td><a href=/events/$event[id]>$event[title]</a></td>";
         echo "<td>$start</td>";

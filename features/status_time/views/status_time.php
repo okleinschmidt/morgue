@@ -10,10 +10,10 @@
       <div id="event-status-container" class="">
           <input id="event-status-input-date" name="event-status-input-date"
              class="input-small datepicker" type="text"
-             value="<?php echo $status_datetime->format('m/d/Y'); ?>" >
+             value="<?php echo $status_datetime->format(getUserDateFormat()); ?>" >
           <input id="event-status-input-time" name="event-status-input-time"
              class="input-mini timeentry" type="text"
-             value="<?php echo $status_datetime->format('g:iA'); ?>" >
+             value="<?php echo $status_datetime->format(getUserTimeFormat()); ?>" >
           <a href="#" id="clear-status" role="button" class="btn">Clear</a>
       </div>
      <?php } else { ?>
